@@ -1,24 +1,106 @@
 import sys
+import numpy as np
+import pandas as pd
+from sqlalchemy import create_engine
+
+import re
+import nltk
+nltk.download(['punkt', 'wordnet','stopwords'])
+nltk.download(['punkt', 'wordnet', 'stopwords', 'averaged_perceptron_tagger'])
+
+from sqlalchemy import create_engine
+import pandas as pd
+import numpy as np
+import pickle
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import confusion_matrix, classification_report, hamming_loss
 
 
 def load_data(database_filepath):
-    pass
+    ''' load data from sql database and
+     return feature dataframe, label-data DataFrame, labels as list'''
+    
+    # load data from database
+    engine = create_engine('sqlite:///'+database_filepath)
+    df = pd.read_sql_table("DisasterResponseDatabase", engine)
+    X = df.message.values 
+    Y = df.iloc[:,4:]
+    return X, Y, Y.columns
 
 
 def tokenize(text):
-    pass
+    '''tokenize input messages'''
+    
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+    clean_tokens = []
+    for tok in tokens:
+        # Remove stop words
+        if tok in stopwords.words("english"):
+            continue
+            
+        # Reduce words to their stems
+        tok = PorterStemmer().stem(tok)
+        
+        # Reduce words to their root form
+        tok = lemmatizer.lemmatize(tok).lower().strip()
+
+        clean_tokens.append(tok)
+    
+    # Remove all non alphabet characters
+    clean_tokens = [tok for tok in clean_tokens if tok.isalpha()]
+    return clean_tokens
+
 
 
 def build_model():
-    pass
+    '''build pipeland, set parameter, do Gridsearch and return model'''
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
+    ])
+    
+    # small set of parameters because of time
+    parameters = {
+        'vect__max_df':[0.75,1.0],
+        'clf__estimator__n_estimators': [20, 50]
+    }
+
+    cv = GridSearchCV(pipeline, param_grid=parameters, verbose=10)
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    '''evaluate model by sklearn classification_report'''
+    
+    Y_pred = model.predict(X_test)
+    
+    for ix, col in enumerate(category_names):
+        print(col)
+        print(classification_report(Y_test[col], Y_pred[:,ix]))
+
+    
+    acc = (Y_pred == Y_test).mean().mean()
+    print("Accuracy Overall:")
+    print(acc)
+
 
 
 def save_model(model, model_filepath):
-    pass
+    '''save model as pickle file'''
+    
+    pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
