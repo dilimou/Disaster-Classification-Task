@@ -30,17 +30,17 @@ data-
 
 ## Requirements:
 
-Pandas
-Matplotlib
-Json
-Plotly
-Nltk
-Flask
-Sklearn
-Sqlalchemy
-Sys
-Re
-Pickle
+- Pandas
+- Matplotlib
+- Json
+- Plotly
+- Nltk
+- Flask
+- Sklearn
+- Sqlalchemy
+- Sys
+- Re
+- Pickle
 
 ## Instructions:
 
