@@ -25,7 +25,7 @@ data-
     - Disaster_Response.db # database with the clean data
 - models
     - train_classifier.py
-    - classifier.pkl # saved model
+    - classifier.pkl # saved model (The picled file is too big to get uploaded on github. Follow the steps below to create it.)
 - README.md
 
 ## Requirements:
