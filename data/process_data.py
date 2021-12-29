@@ -26,7 +26,7 @@ def clean_data(df):
     row = categories.iloc[0]
     
     # remove last 2 characters of catergory names
-    category_colnames = [val[:-2] for val in row]
+    category_colnames = row.apply(lambda name: name[:-2])
     
     # rename the columns of `categories`
     categories.columns = category_colnames
@@ -36,7 +36,7 @@ def clean_data(df):
         categories[column] = categories[column].str[-1]
     
         # convert column from string to numeric
-        categories[column] = pd.to_numeric(categories[column], downcast="integer")
+        categories[column] = categories[column].astype(int)
     
     # drop the original categories column from `df`
     df.drop("categories", axis=1, inplace=True)
