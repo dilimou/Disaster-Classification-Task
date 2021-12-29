@@ -54,3 +54,6 @@ Run the following commands in the project's root directory to recreate the datab
 - python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl
 
 
+## Licensing, Authors, Acknowledgements
+
+All credit for the data foes to Figure Eight. For collecting and labelling all the data. You can find all necessary information on the dataset on [here](https://www.figure-eight.com/).
