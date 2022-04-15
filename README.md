@@ -7,6 +7,7 @@ The project is divided into multiple parts:
 Data Processing, ETL Pipeline to extract data from source, clean data and save them in a proper data structure.
 Machine Learning Pipeline to train a model which is able to classify text messages in 36 categories.
 Web Application using Flask to show model results and predictions in real time.
+The model reached an accuracy of 94%
 
 Data:
 The data in this project comes from Figure Eight.
@@ -21,11 +22,11 @@ The data in this project comes from Figure Eight.
 data- 
     - disaster_categories.csv # data to process
     - disaster_messages.csv # data to process
-    - process_data.py
-    - Disaster_Response.db # database with the clean data
+    - process_data.py # Data processing script
+    - DisasterResponse.db # database return after processing of the data
 - models
-    - train_classifier.py
-    - classifier.pkl # saved model (The picled file is too big to get uploaded on github. Follow the steps below to create it.)
+    - train_classifier.py # Script to generate the model
+    - classifier.pkl # Model generated
 - README.md
 
 ## Requirements:
@@ -44,14 +45,20 @@ data-
 
 ## Instructions:
 
-In a terminal, go to the 'app' folder, run the following command:
-- python run.py
+1. Run the following commands in the project's root directory to set up your database and model.
+
+    - To run ETL pipeline that cleans data and stores in database
+        `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
+    - To run ML pipeline that trains classifier and saves
+        `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
+
+
+2. Run the following command in the app's directory to run your web app.
+    `python run.py`
 
 Go to [http://0.0.0.0:3001/](http://0.0.0.0:3001/)
 
-Run the following commands in the project's root directory to recreate the database and model:
-- python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db
-- python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl
+If you can access the app throuugh the(http://0.0.0.0:3001/) check your terminal. The `python run.py` result will contain the path were you can locally run the app
 
 
 ## Licensing, Authors, Acknowledgements
