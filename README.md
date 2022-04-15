@@ -26,6 +26,8 @@ data-
 - models
     - train_classifier.py # Script to generate the model
     - classifier.pkl # Model generated
+- ETL Pipeline Preparation.ipynb
+- ML Pipeline Preparation.ipynb
 - README.md
 
 ## Requirements:
@@ -48,8 +50,11 @@ data-
 
     - To run ETL pipeline that cleans data and stores in database
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
+    - Or run the cells in the notebook ETL Pipeline Preparation.ipynb  to get the db
+    
     - To run ML pipeline that trains classifier and saves
         `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
+    - Or run the cells in the notebook ML Pipeline Preparation.ipynb to get the model
 
 
 2. Run the following command in the app's directory to run your web app.
