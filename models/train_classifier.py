@@ -26,44 +26,52 @@ from sklearn.metrics import confusion_matrix, classification_report, hamming_los
 
 
 def load_data(database_filepath):
-    ''' load data from sql database and
-     return feature dataframe, label-data DataFrame, labels as list'''
+    ''' load data from sql database and return feature dataframe, label-data DataFrame, labels as list'''
     
     # load data from database
     engine = create_engine('sqlite:///'+database_filepath)
-    df = pd.read_sql_table("DisasterResponseDatabase", engine)
+    df = pd.read_sql('SELECT * FROM DisasterResponseDatabase', con=engine)
     X = df.message.values 
     Y = df.iloc[:,4:]
-    return X, Y, Y.columns
 
 
 def tokenize(text):
     '''tokenize input messages'''
     
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    detected_urls = re.findall(url_regex, text)
+    
+    for url in detected_urls:
+        text = text.replace(url, "urlplaceholder")
+    
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
+    
     clean_tokens = []
-    for tok in tokens:
+    
+    for clean_tok in tokens:
+       
         # Remove stop words
-        if tok in stopwords.words("english"):
+        if clean_tok in stopwords.words("english"):
             continue
             
         # Reduce words to their stems
-        tok = PorterStemmer().stem(tok)
+        clean_tok = PorterStemmer().stem(clean_tok)
         
         # Reduce words to their root form
-        tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tok = lemmatizer.lemmatize(clean_tok).lower().strip()
 
-        clean_tokens.append(tok)
+        clean_tokens.append(clean_tok)
+        
+    clean_tokens = [clean_tok for clean_tok in clean_tokens if clean_tok.isalpha()]
     
-    # Remove all non alphabet characters
-    clean_tokens = [tok for tok in clean_tokens if tok.isalpha()]
     return clean_tokens
 
 
 
 def build_model():
     '''build pipeland, set parameter, do Gridsearch and return model'''
+
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -72,8 +80,8 @@ def build_model():
     
     # small set of parameters because of time
     parameters = {
-        'vect__max_df':[0.75,1.0],
-        'clf__estimator__n_estimators': [20, 50]
+        'vect__max_df':[0.5,0.75,1.0],
+        'clf__estimator__min_samples_split': [2, 3, 4]
     }
 
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=10)
