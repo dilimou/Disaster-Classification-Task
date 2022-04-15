@@ -78,4 +78,4 @@ classification example
 
 ## Licensing, Authors, Acknowledgements
 
-All credit for the data foes to Figure Eight. For collecting and labelling all the data. You can find all necessary information on the dataset on [here](https://www.figure-eight.com/).
+All credit for the data goes to Figure Eight. For collecting and labelling all the data. You can find all necessary information on the dataset on [here](https://www.figure-eight.com/).
