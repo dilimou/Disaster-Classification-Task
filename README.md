@@ -7,7 +7,6 @@ The project is divided into multiple parts:
 Data Processing, ETL Pipeline to extract data from source, clean data and save them in a proper data structure.
 Machine Learning Pipeline to train a model which is able to classify text messages in 36 categories.
 Web Application using Flask to show model results and predictions in real time.
-The model reached an accuracy of 94%
 
 Data:
 The data in this project comes from Figure Eight.
@@ -59,6 +58,23 @@ data-
 Go to [http://0.0.0.0:3001/](http://0.0.0.0:3001/)
 
 If you can access the app throuugh the(http://0.0.0.0:3001/) check your terminal. The `python run.py` result will contain the path were you can locally run the app
+
+
+## Results
+
+The home page of the app
+![image](https://user-images.githubusercontent.com/23463800/163554067-1289c749-8be2-47b0-b551-faee4deaf53f.png)
+
+![image](https://user-images.githubusercontent.com/23463800/163554100-ca5cdb52-2d98-4828-801b-ece4bd8d45ff.png)
+
+![image](https://user-images.githubusercontent.com/23463800/163554180-a1b8ec40-f108-4291-924d-aae92242444b.png)
+
+With the available data, the model reached an accuracy of 94%.
+
+
+
+classification example
+![image](https://user-images.githubusercontent.com/23463800/163553955-8476f246-2906-41fe-a25e-a98c95dfee03.png)
 
 
 ## Licensing, Authors, Acknowledgements
