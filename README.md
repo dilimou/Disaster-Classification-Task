@@ -71,10 +71,9 @@ The home page of the app
 
 With the available data, the model reached an accuracy of 94%.
 
-
-
 classification example
-![image](https://user-images.githubusercontent.com/23463800/163553955-8476f246-2906-41fe-a25e-a98c95dfee03.png)
+![image](https://user-images.githubusercontent.com/23463800/163554474-574c895e-99f4-4c45-a5f6-bb655997e47d.png)
+
 
 
 ## Licensing, Authors, Acknowledgements
