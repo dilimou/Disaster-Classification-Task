@@ -1,28 +1,63 @@
-import json
-import plotly
+import numpy as np
+import re
 import pandas as pd
+import json
+import nltk
+nltk.download(['punkt', 'wordnet','stopwords'])
+nltk.download(['punkt', 'wordnet', 'stopwords', 'averaged_perceptron_tagger'])
+nltk.download('omw-1.4')
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+import plotly
+from plotly.graph_objs import Bar,Marker
+# from sklearn.externals import joblib
+import joblib
 from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
 
 def tokenize(text):
+    """
+        Tokenization function. To clean the text data and remove properties not useul for analysis.
+        input: raw text
+        process: remove stop words, ponctuations, reduce the words to their root etc...
+        Returns: clean and tokenized text
+                                        """
+    
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    detected_urls = re.findall(url_regex, text)
+    
+    for url in detected_urls:
+        text = text.replace(url, "urlplaceholder")
+    
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
-
+    
     clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
+    
+    for clean_tok in tokens:
+       
+        # Remove stop words
+        if clean_tok in stopwords.words("english"):
+            continue
+            
+        # Reduce words to their stems
+        clean_tok = PorterStemmer().stem(clean_tok)
+        
+        # Reduce words to their root form
+        clean_tok = lemmatizer.lemmatize(clean_tok).lower().strip()
 
+        clean_tokens.append(clean_tok)
+        
+    clean_tokens = [clean_tok for clean_tok in clean_tokens if clean_tok.isalpha()]
+    
     return clean_tokens
 
 # load data
@@ -39,21 +74,19 @@ model = joblib.load("../models/classifier.pkl")
 def index():
     
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
-    disaster_names = list(df.columns[4:])
-    disaster_counts = df[disaster_names].sum()
+    df_categories = df.iloc[:,4:]
+    genre_cat = df.groupby('genre').count().reset_index().drop(['id','message','original'], axis=1).set_index('genre')
+    genre_cat = genre_cat.T.reset_index()
     
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
                     x=genre_names,
-                    y=genre_counts
+                    y=genre_counts,
                 )
             ],
 
@@ -70,22 +103,52 @@ def index():
         {
             'data': [
                 Bar(
-                    x=disaster_names,
-                    y=disaster_counts
+                    x=df_categories.columns,
+                    y=df_categories.count()
                 )
             ],
-            
+
             'layout': {
-                'title': 'Distribution of Disaster',
+                'title': 'Distribution of Message Categories',
                 'yaxis': {
                     'title': "Count"
                 },
                 'xaxis': {
-                    'title': "Disaster"
+                    'title': "Categories"
                 }
             }
         },
+        {
+            'data': [
+                Bar(
+                    x=genre_cat['index'],
+                    y=genre_cat['direct'],
+                    name = 'direct'
+                ),
+                Bar(
+                    x=genre_cat['index'],
+                    y=genre_cat['news'],
+                    name = 'news'
+                ),
+                Bar(
+                    x=genre_cat['index'],
+                    y=genre_cat['social'],
+                    name = 'social'
+                ),
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Categories by genre',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Categories"
+                }
+            }
+        }
     ]
+     
     
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
