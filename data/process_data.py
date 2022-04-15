@@ -26,7 +26,7 @@ def clean_data(df):
     row = categories.iloc[0]
     
     # remove last 2 characters of catergory names
-    category_colnames = row.apply(lambda name: name[:-2])
+    category_colnames = [val[:-2] for val in row]
     
     # rename the columns of `categories`
     categories.columns = category_colnames
@@ -34,12 +34,9 @@ def clean_data(df):
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].str[-1]
-        
-        #convert to Binary
-        categories[column].replace(2, 0, inplace=True)
     
         # convert column from string to numeric
-        categories[column] = categories[column].astype(int)
+        categories[column] = pd.to_numeric(categories[column], downcast="integer")
     
     # drop the original categories column from `df`
     df.drop("categories", axis=1, inplace=True)
@@ -57,7 +54,7 @@ def save_data(df, database_filename):
     '''save dataframe as sql database file'''
     
     engine = create_engine('sqlite:///' + database_filename)
-    df.to_sql('DisasterResponseDatabase', engine, index=False,if_exists='replace')    
+    df.to_sql('DisasterResponseDatabase', engine, index=False)    
 
 
 def main():
